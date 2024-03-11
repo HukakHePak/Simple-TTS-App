@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 100,
     borderColor: PALETTE.light,
+    
   },
   // ['@m']
   buttonText: {

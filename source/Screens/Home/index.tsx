@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Button,
   Pressable,
   SafeAreaView,
@@ -24,82 +25,113 @@ import styles from './styles';
 import {useQuery} from 'react-query';
 import {SpeechKey} from '../../../env.json';
 import PALETTE from '../../core/palette';
+import AnimatedSoundButton from '../../components/AnimatedSoundButton';
+import TrackPlayer, {State, usePlaybackState} from 'react-native-track-player';
 
 const URL = 'https://gtts.note-lawn.ru';
 
 function Home(): React.JSX.Element {
   const [lang, setLang] = useState('ru');
   const [text, setText] = useState('');
-  const [sound, setSound] = useState(false);
+  // const [sound, setSound] = useState(false);
 
-  const {isLoading, error, data} = useQuery(['voice', sound], () => {
-    if (text) {
-      setSound(false);
+  const {state} = usePlaybackState();
 
-      return fetch(`${URL}/${lang}?text=${text}`, {
-        headers: {Authorization: SpeechKey},
-      });
-    }
+  // playbackState.state
 
-    return Promise.reject('Пустой текст');
-  });
+  const playHandler = async () => {
+    // const track = await fetch(`${URL}/${lang}?text=${text}`, {
+    //   headers: {Authorization: SpeechKey},
+    // // }).then(console.log);
+    // }).then(res => res.);
+    // // });
 
-  useEffect(() => {
-    if(data) {
-        console.log(data);
-        
-        
-    }
-  }, [data]);
+    // console.log(track);
 
-  console.log(!!data);
+    // TrackPlayer.add({
+    //   url: `${URL}/${lang}?text=${text}`, // Load media from the network
+    //   headers: {Authorization: SpeechKey},
+    //   // url: track,
+    //   contentType: 'audio/mpeg',
+    //   title: 'text',
+    //   artist: 'HukakHePak',
+    // })
+    //   .then(console.log)
+    const track = {
+      url: `${URL}/${lang}?text=${text}`, // Load media from the network
+      headers: {Authorization: SpeechKey},
+      // url: track,
+      contentType: 'audio/mpeg',
+      title: 'text',
+      artist: 'HukakHePak',
+    };
 
-  //   useEffect(() => {
-  //     console.log('send request');
-  //     fetch(URL)
-  //     // fetch(`${URL}/ru?text=hello`, {
-  //     //   headers: {Authorization: SpeechKey},
-  //     // })
-  //       .then(console.log)
-  //       .catch(console.log)
-  //       .finally(console.log);
-  //   }, []);
 
-  //   console.log(isLoading, error);
+    TrackPlayer.setPlayWhenReady(true);
 
-  //   console.log(data)
+    // TrackPlayer.setVolume(1);
+    TrackPlayer.setRate(2);
 
-  //   console.log(isLoading, error, data);
+    await TrackPlayer.load(track);
 
-  
+    // TrackPlayer.play();
+
+    // .then(e => {
+    //   TrackPlayer.play().then(console.log).catch(console.log);
+    // });
+    // .catch(console.log);
+    // TrackPlayer.reset();
+
+    // console.log();
+  };
+
+  console.log(state);
+
+  const isLoading = state === State.Loading;
 
   return (
     <SafeAreaView>
       <StatusBar backgroundColor={PALETTE.dark} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={styles.container}>
-        <View style={styles.wrapper}>
+
+      <View style={styles.container}>
+        {/* <View> */}
+        <View style={{flex: 1}}>
           <TextInput
             style={styles.textInput}
             value={text}
+            // numberOfLines={16}
+            multiline
+            allowFontScaling={false}
             onChangeText={e => setText(e)}
           />
-
-
-
-          <Text>{error as string}</Text>
-          <Button color="transparent" onPress={console.log} title="Озвучить" />
-
-          <Pressable style={styles.button} onPress={() => setSound(true)}>
-            {isLoading ? (
-              <ActivityIndicator size="large" />
-            ) : (
-              <Text>Озвучить</Text>
-            )}
-          </Pressable>
         </View>
-      </ScrollView>
+
+        {/* <View> */}
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: isLoading ? 'red' : 'transparent',
+          }}>
+          <AnimatedSoundButton onPress={playHandler} loading={isLoading} />
+          {/* <Pressable
+            onPress={() => {
+              // console.log('press');
+              setSound(true);
+            }}>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>sound img</Text>
+
+              {isLoading ? (
+                <ActivityIndicator size="large" />
+              ) : (
+                <Text style={styles.buttonText}>Озвучить</Text>
+              )}
+            </View>
+          </Pressable> */}
+        </View>
+      </View>
     </SafeAreaView>
   );
 }

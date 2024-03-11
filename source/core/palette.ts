@@ -1,7 +1,7 @@
 const PALETTE = {
-  light: '#3d0b8c',
-  dark: '#180029',
-  ice: '#290642',
+  light: '#6614bb',
+  dark: '#150934',
+  pink: '#e479ea',
 };
 
 export default PALETTE;
